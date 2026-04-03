@@ -12,14 +12,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(expressLayouts);
-
-app.set("layout", "layouts");
+app.set("layout", "layout");
 
 // view engine setup
 app.set('view engine', 'ejs');
 
 // database connection
 mongoose.connect(process.env.MONGODB_URI);
+
+// frontends Routes
+app.use('/', require('./routes/frontend'));
+
+app.use("/admin", (req, res, next) => {
+   res.locals.layout = "admin/layout";
+   next();
+});
+
+// admin Routes
+app.use('/admin', require('./routes/admin'));
+
 
 app.get('/', (req, res) => {
 res.send('Hello World');

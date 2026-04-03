@@ -2,14 +2,22 @@ const categoryModel = require('../models/Category');
 const newsModel = require('../models/News');
 const userModel = require('../models/User');
 
-const allArticles = async (req, res) => {}
-const addArticlePage = async (req, res) => {}
-const addArticle = async (req, res) => {}
-const updateArticlePage = async (req, res) => {}
-const updateArticle = async (req, res) => {}
-const deleteArticle = async (req, res) => {}
+const allArticles = async (req, res) => {
+    res.render("admin/articles/index");
+};
 
+const addArticlePage = async (req, res) => {
+    res.render("admin/articles/create");
+};
 
+const addArticle = async (req, res) => {};
+
+const updateArticlePage = async (req, res) => {
+    res.render("admin/articles/update");
+};
+
+const updateArticle = async (req, res) => {};
+const deleteArticle = async (req, res) => {};
 
 module.exports = {
     allArticles,
@@ -18,4 +26,4 @@ module.exports = {
     updateArticlePage,
     updateArticle,
     deleteArticle
-}
+};
