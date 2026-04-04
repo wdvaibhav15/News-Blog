@@ -539,3 +539,47 @@ border: 3px solid var(--main-color);
 /* ===================== */
 /* FrontEnd CSS END */
 /* ===================== */
+#usersTable {
+  margin-top: 20px;
+}
+
+#usersTable .tabulator {
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+#usersTable .tabulator-header {
+  background: #f8f8f8;
+  font-weight: bold;
+}
+
+#usersTable .tabulator-cell,
+#usersTable .tabulator-col {
+  padding: 10px;
+}
+
+#usersTable .tabulator-footer {
+  background: #f8f8f8;
+}
+
+.add-new {
+  display: inline-block;
+  text-decoration: none;
+  background: #2d8cf0;
+  color: #fff;
+  padding: 12px 30px;
+  text-align: center;
+  font-weight: 500;
+  border: none;
+}
+
+.add-new:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.admin-heading {
+  margin: 20px 0;
+  font-size: 30px;
+  font-weight: 500;
+}
