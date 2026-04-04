@@ -89,7 +89,7 @@ const deleteUser = async (req, res) => {
         if (!user) {
             return res.status(404).send("User not found");
         }
-        res.redirect('/admin/users');
+        res.json({ message: true });
     } catch (error) {
         console.log( error);
         res.status(500).send("Internal Server Error");
