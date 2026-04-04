@@ -50,18 +50,24 @@
               <li>
                 <a href="/admin/article">Article</a>
               </li>
+              
+               <% if (typeof role !== 'undefined' && role === "admin") { %>
               <li>
                 <a href="/admin/category">Category</a>
               </li>
               <li>
                 <a href="/admin/users">Users</a>
               </li>
+              <% } %>
               <li>
                 <a href="/admin/comments">Comments</a>
               </li>
+              
+               <% if (typeof role !== 'undefined' && role === "admin") { %>
               <li>
                 <a href="/admin/setting">Settings</a>
               </li>
+              <% } %>
             </ul>
           </div>
         </div>

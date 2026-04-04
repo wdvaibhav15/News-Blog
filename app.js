@@ -3,14 +3,16 @@ const app = express();
 const mongoose = require('mongoose');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
-const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // middle wares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
 app.use(expressLayouts);
 app.set("layout", "layout");
 
@@ -23,9 +25,28 @@ mongoose.connect(process.env.MONGODB_URI);
 // frontends Routes
 app.use('/', require('./routes/frontend'));
 
-app.use("/admin", (req, res, next) => {
-   res.locals.layout = "admin/layout";
-   next();
+// app.use("/admin", (req, res, next) => {
+//    res.locals.layout = "admin/layout";
+//    next();
+// });
+app.use('/admin', (req, res, next) => {
+  res.locals.layout = 'admin/layout';
+  res.locals.role = null;
+  res.locals.fullname = null;
+
+  const token = req.cookies.token;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      res.locals.role = decoded.role;
+      res.locals.fullname = decoded.fullname;
+    } catch (error) {
+      res.clearCookie('token');
+    }
+  }
+
+  next();
 });
 
 // admin Routes
