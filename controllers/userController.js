@@ -56,8 +56,17 @@ const setting = async (req, res) => {
 
 const allUser = async (req, res) => {
     try {
-        const users = await userModel.find();
-        res.render('admin/users/index', { users, role: req.role });
+        const users = await userModel.find().sort({ _id: 1 });
+
+        const formattedUsers = users.map((user, index) => ({
+            _id: user._id,
+            serial: index + 1,
+            fullname: user.fullname,
+            username: user.username,
+            role: user.role
+        }));
+
+        res.render('admin/users/index', { users: formattedUsers, role: req.role });
     } catch (error) {
         console.log("allUser error:", error);
         res.status(500).send("Server Error");
