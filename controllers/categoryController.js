@@ -1,4 +1,6 @@
 const categoryModel = require('../models/Category');
+const createError = require('../utils/error-message');
+const { validationResult } = require('express-validator');
 
 const allCategory = async (req, res, next) => {
   try {
@@ -26,7 +28,7 @@ const allCategory = async (req, res, next) => {
 
 const addCategoryPage = async (req, res, next) => {
   try {
-    res.render('admin/categories/create', { role: req.role });
+    res.render('admin/categories/create', { role: req.role, errors: 0 });
   } catch (error) {
     console.log('addCategoryPage error:', error);
     next(error);
@@ -34,6 +36,13 @@ const addCategoryPage = async (req, res, next) => {
 };
 
 const addCategory = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.render('admin/categories/create', {
+      role: req.role,
+      errors: errors.array()
+    });
+  }
   try {
     const { name, description } = req.body;
 
@@ -60,15 +69,25 @@ const updateCategoryPage = async (req, res, next) => {
 
     res.render('admin/categories/update', {
       category,
-      role: req.role
+      role: req.role,
+      errors: 0
     });
   } catch (error) {
     console.log('updateCategoryPage error:', error);
     next(error);
   }
 };
-
 const updateCategory = async (req, res, next) => {
+  const id = req.params.id;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const category = await categoryModel.findById(id); // get category
+    return res.render('admin/categories/update', {
+      category,
+      role: req.role,
+      errors: errors.array()
+    });
+  }
   try {
     const { name, description } = req.body;
 

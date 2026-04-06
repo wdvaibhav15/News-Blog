@@ -5,16 +5,28 @@ const userModel = require('../models/User');
 const newsModel = require('../models/News');
 const categoryModel = require('../models/Category');
 const settingModel = require('../models/setting');
+const{ validationResult } = require('express-validator');
+const createError = require('../utils/error-message');
 
 dotenv.config();
 
 const loginPage = async (req, res) => {
     res.render('admin/login', {
-        layout: false
+        layout: false,
+        errors: 0
     });
 };
 
 const adminLogin = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        //return res.status(400).json({ errors: errors.array() });
+       return res.render('admin/login', {
+            layout: false,
+            errors: errors.array()
+        });
+    }
+
     const { username, password } = req.body;
 
     try {
@@ -147,10 +159,17 @@ const allUser = async (req, res, next) => {
 };
 
 const addUserPage = async (req, res) => {
-    res.render('admin/users/create', { role: req.role });
+    res.render('admin/users/create', { role: req.role, errors: 0 });
 };
 
 const addUser = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.render('admin/users/create', {
+            role: req.role,
+            errors: errors.array()
+        });
+    }
     try {
         await userModel.create(req.body);
         res.redirect('/admin/users');
@@ -172,7 +191,8 @@ const updateUserPage = async (req, res, next) => {
 
         res.render('admin/users/update', {
             user,
-            role: req.role
+            role: req.role,
+            errors: 0
         });
     } catch (error) {
         console.log(error);
@@ -182,6 +202,15 @@ const updateUserPage = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
     const id = req.params.id;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.render('admin/users/update', {
+            user: req.body,
+            role: req.role,
+            errors: errors.array()
+        });
+    }
     const { fullname, password, role } = req.body;
 
     try {
