@@ -18,7 +18,8 @@ router.get("/logout", userController.logout);
 router.get("/dashboard", isLoggedIn,userController.dashboard);
 
 // settings Route
-router.get("/setting",isLoggedIn,isAdmin, userController.setting);
+router.get("/settings",isLoggedIn,isAdmin, userController.settings);
+router.post("/save-settings",isLoggedIn,isAdmin, upload.single("website_logo"), userController.saveSettings);
 
 // user CRUD Routes
 router.get("/users",isLoggedIn,isAdmin, userController.allUser);
@@ -46,5 +47,32 @@ router.delete("/delete-article/:id", isLoggedIn, articleController.deleteArticle
 
 // comment Routes
 router.get("/comments", isLoggedIn, commentController.allComments);
+
+//404 Middleware
+router.use(isLoggedIn,(req, res, next) => {
+    res.status(404).render("admin/404", {
+        message: "404 Not Found",
+        role: req.role
+    });
+});
+
+//500 Middleware
+router.use(isLoggedIn,(err, req, res, next) => {
+    console.error(err.stack); 
+    const status = err.status || 500;
+    const view = status === 404 ? "admin/404" : "admin/500";   
+    res.status(status).render(view, {
+        message: err.message || "something went wrong",
+        role: req.role
+    });
+});
+// //500 Middleware
+// router.use(isLoggedIn,(err, req, res, next) => {
+//     res.status(500).render("admin/500", {
+//         message: err.message || "500 Internal Server Error",
+//         role: req.role
+//     });
+// });
+
 
 module.exports = router;

@@ -1,8 +1,11 @@
 const categoryModel = require('../models/Category');
 const newsModel = require('../models/News');
 const userModel = require('../models/User');
+const fs = require('fs');
+const path = require('path');
+const createError = require('../utils/error-message');
 
-const allArticles = async (req, res) => {
+const allArticles = async (req, res,next) => {
     try {
         let articles;
         if(req.role === "admin"){
@@ -17,7 +20,7 @@ const allArticles = async (req, res) => {
         res.render("admin/articles/index",{role:req.role, articles});
     } catch (error) {
         console.log(error);
-        res.status(500).send("Something went wrong");
+        next(error);
     }
 };
 
@@ -27,7 +30,7 @@ const addArticlePage = async (req, res) => {
 };
 
 
-const addArticle = async (req, res) => {
+const addArticle = async (req, res, next) => {
     
     try {
         const { title, content , category } = req.body;
@@ -43,18 +46,19 @@ const addArticle = async (req, res) => {
         res.redirect('/admin/article');
     } catch (error) {
         console.log('addArticle error:', error);
-        res.status(500).send('Server Error');
+        next(error);
     }
 };
 
-const updateArticlePage = async (req, res) => {
+const updateArticlePage = async (req, res, next) => {
     const id = req.params.id;
     try {
         const article = await newsModel.findById(id)
                             .populate('category',"name")
                             .populate('author',"fullname");
         if (!article) {
-            return res.status(404).send('Article not found');
+            
+            return next(createError('Article not found', 404));
         }
 
         if(req.role === "author"){
@@ -67,17 +71,19 @@ const updateArticlePage = async (req, res) => {
         res.render("admin/articles/update",{role:req.role, article, categories});
     } catch (error) {
         console.log('updateArticlePage error:', error);
-        res.status(500).send('Server Error');
+        // res.status(500).send('Server Error');
+        next(error);
     }
 };
 
-const updateArticle = async (req, res) => {
+const updateArticle = async (req, res, next) => {
     const id = req.params.id;
     try {
         const { title, content , category } = req.body;
         const article = await newsModel.findById(id);
         if (!article) {
-            return res.status(404).send('Article not found');
+           return next(createError('Article not found', 404));
+              
         }
 
          if(req.role === "author"){
@@ -89,23 +95,27 @@ const updateArticle = async (req, res) => {
         article.title = title;
         article.content = content;
         article.category = category;
+
         if (req.file) {
+            const oldImagePath = path.join(__dirname, '../public/images', article.image);
+            fs.unlinkSync(oldImagePath);
             article.image = req.file.filename;
         }
         await article.save();
         res.redirect('/admin/article');
     } catch (error) {
         console.log('updateArticle error:', error);
-        res.status(500).send('Server Error');
+       // res.status(500).send('Server Error');
+        next(error);
     }
 };
 
-const deleteArticle = async (req, res) => {
+const deleteArticle = async (req, res, next) => {
     const id = req.params.id;
     try {
         const article = await newsModel.findById(id);    
         if (!article) {
-            return res.status(404).send('Article not found');
+            return next(createError('Article not found', 404));
         }
 
          if(req.role === "author"){
@@ -113,6 +123,15 @@ const deleteArticle = async (req, res) => {
                 return res.status(401).send('Unauthorized');
             }    
         }
+
+        try {
+            const oldImagePath = path.join(__dirname, '../public/images', article.image);
+            fs.unlinkSync(oldImagePath);
+        } catch (error) {
+            console.log('Error deleting old image:', error);
+            next(error);
+        }
+
         await article.deleteOne();
         res.json({success: true});
     } catch (error) {
