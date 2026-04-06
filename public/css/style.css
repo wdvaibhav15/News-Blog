@@ -583,3 +583,49 @@ border: 3px solid var(--main-color);
   font-size: 30px;
   font-weight: 500;
 }
+
+/* <-------------seprator----------> */
+.recent-post-container{
+    margin-top: 20px;
+}
+
+.recent-post{
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.recent-post img{
+    width: 120px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid #aaa;
+    display: block;
+}
+
+.recent-post-content{
+    flex: 1;
+}
+
+.recent-post-content h5{
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.recent-post-content a{
+    text-decoration: none;
+    color: #0d6efd;
+}
+
+.recent-post-content .meta{
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.recent-post-content .read-more{
+    font-size: 13px;
+    padding: 4px 8px;
+}
