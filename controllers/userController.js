@@ -7,6 +7,7 @@ const categoryModel = require('../models/Category');
 const settingModel = require('../models/setting');
 const{ validationResult } = require('express-validator');
 const createError = require('../utils/error-message');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -106,36 +107,35 @@ const settings = async (req, res, next) => {
         next(error);
     }
 };
-
-const saveSettings = async (req, res, next) => {
+ const saveSettings = async (req, res, next) => {
     const { website_title, footer_description } = req.body;
     const website_logo = req.file ? req.file.filename : null;
 
     try {
-        const existingSettings = await settingModel.findOne();
+        const setting = await settingModel.findOne();
 
-        let updatedData = {
-            website_title,
-            footer_description
-        };
-
-        if (website_logo) {
-            updatedData.website_logo = website_logo;
+        if (!setting) {
+            setting = new settingModel();
         }
-
-        await settingModel.findOneAndUpdate(
-            {},
-            updatedData,
-            { new: true, upsert: true }
-        );
-
+            setting.website_title = website_title;
+            setting.footer_description = footer_description;
+            
+            if(website_logo){
+                if(setting.website_logo){
+                    const logoPath = `./public/images/${setting.website_logo}`;
+                    if (fs.existsSync(logoPath)) {
+                      fs.unlinkSync(logoPath);
+                    }
+                }
+                setting.website_logo = website_logo;
+            }
+        await setting.save();
         res.redirect('/admin/settings');
     } catch (error) {
-        console.log(error);
+        
         next(error);
     }
 };
-
 const allUser = async (req, res, next) => {
     try {
         const users = await userModel.find().sort({ _id: 1 });
@@ -240,12 +240,19 @@ const deleteUser = async (req, res, next) => {
     const id = req.params.id;
 
     try {
-        const user = await userModel.findByIdAndDelete(id);
+        const user = await userModel.findById(id);
 
         if (!user) {
             return next(createError('User not found', 404));
         }
+         
+        const article = await newsModel.findOne({ author: id });
 
+        if (article) {
+            return res.status(400).json({ success: false, message: 'Cannot delete user with associated articles' });
+        }
+
+        await user.deleteOne();
         res.json({ message: true });
     } catch (error) {
         console.log(error);

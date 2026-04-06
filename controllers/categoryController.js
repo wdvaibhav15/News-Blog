@@ -1,6 +1,7 @@
 const categoryModel = require('../models/Category');
 const createError = require('../utils/error-message');
 const { validationResult } = require('express-validator');
+const newsModel = require('../models/News');
 
 const allCategory = async (req, res, next) => {
   try {
@@ -111,11 +112,19 @@ const updateCategory = async (req, res, next) => {
 
 const deleteCategory = async (req, res, next) => {
   try {
-    const category = await categoryModel.findByIdAndDelete(req.params.id);
+    const category = await categoryModel.findById(req.params.id);
 
     if (!category) {
       return next(createError('Category not found', 404));
     }
+
+    const article = await newsModel.findOne({ category: category._id });
+
+    if (article) {
+      return res.status(400).json({ success: false, message: 'Cannot delete category with associated articles' });
+    }
+
+    await category.deleteOne();
 
     res.json({ message: true });
   } catch (error) {

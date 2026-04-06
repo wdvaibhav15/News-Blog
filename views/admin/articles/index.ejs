@@ -66,6 +66,11 @@
         if (response.ok) {
           window.location.reload();
         }
+
+        if (response.status === 404) {
+          const errorData = await response.json();
+          alert(errorData.message || "Article not found.");
+        }
       }
     } catch (error) {
       console.log(error);
@@ -73,6 +78,7 @@
   }
 </script>
 
-<%- contentFor("summernoteCSS")%>
+
+<%- contentFor("tabulatorCSS")%>
+
 <link href="https://unpkg.com/tabulator-tables@6.0.0/dist/css/tabulator.min.css" rel="stylesheet">
-<link href="/css/tabulator_bootstrap5.min.css" rel="stylesheet">
