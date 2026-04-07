@@ -5,15 +5,24 @@ const newsModel = require('../models/News');
 const userModel = require('../models/User');
 const commentModel = require('../models/Comment');
 const settingModle = require('../models/Setting');
+const paginate = require('../utils/paginate');
 
 const index = async (req, res) => {
     try {
-        const news = await newsModel.find()
-            .populate('category', { name: 1, slug: 1 })
-            .populate('author', 'fullname')
-            .sort({ createdAt: -1 });
-         
-        res.render("index", { news });
+        // const news = await newsModel.find()
+        //     .populate('category', { name: 1, slug: 1 })
+        //     .populate('author', 'fullname')
+        //     .sort({ createdAt: -1 });
+        const paginatedNews = await paginate(newsModel, {}, 
+                               req.query, {
+                               populate: [
+                               { path: 'category', select: 'name slug' },
+                               { path: 'author', select: 'fullname' },
+                               ],
+                               sort: { createdAt: -1 },
+        });
+        // res.json(paginatedNews);
+         res.render("index", { paginatedNews, query: req.query });
     } catch (error) {
         console.log("index error:", error);
         res.status(500).send("Server Error");
@@ -28,13 +37,21 @@ const articleByCategories = async (req, res) => {
             return res.status(404).send("Category not found");
         }
 
-        const news = await newsModel.find({ category: category._id })
-            .populate('category', { name: 1, slug: 1 })
-            .populate('author', 'fullname')
-            .sort({ createdAt: -1 });
+        // const news = await newsModel.find({ category: category._id })
+        //     .populate('category', { name: 1, slug: 1 })
+        //     .populate('author', 'fullname')
+        //     .sort({ createdAt: -1 });
+        const paginatedNews = await paginate(newsModel, {category: category._id}, 
+                               req.query, {
+                               populate: [
+                               { path: 'category', select: 'name slug' },
+                               { path: 'author', select: 'fullname' },
+                               ],
+                               sort: { createdAt: -1 },
+        });
 
        
-        res.render("category", { news, category });
+        res.render("category", { paginatedNews, category, query: req.query });
     } catch (error) {
         console.log("articleByCategories error:", error);
         res.status(500).send("Server Error");
@@ -70,19 +87,32 @@ const search = async (req, res) => {
     try {
         const searchQuery = req.query.search || "";
 
-        const news = await newsModel.find({
-            $or: [
-                { title: { $regex: searchQuery, $options: 'i' } },
-                { content: { $regex: searchQuery, $options: 'i' } }
-            ]
-        })
-            .populate('category', { name: 1, slug: 1 })
-            .populate('author', 'fullname')
-            .sort({ createdAt: -1 });
+        // const news = await newsModel.find({
+        //     $or: [
+        //         { title: { $regex: searchQuery, $options: 'i' } },
+        //         { content: { $regex: searchQuery, $options: 'i' } }
+        //     ]
+        // })
+        //     .populate('category', { name: 1, slug: 1 })
+        //     .populate('author', 'fullname')
+        //     .sort({ createdAt: -1 });
+        const paginatedNews = await paginate(newsModel, {
+                         $or: [
+                             { title: { $regex: searchQuery, $options: 'i' } },
+                             { content: { $regex: searchQuery, $options: 'i' } }
+                     ]
+                    }, 
+                       req.query, {
+                       populate: [
+                       { path: 'category', select: 'name slug' },
+                       { path: 'author', select: 'fullname' },
+                       ],
+                       sort: { createdAt: -1 },
+                   });
 
         
 
-        res.render("search", { news, searchQuery });
+        res.render("search", { paginatedNews , searchQuery, query: req.query });
     } catch (error) {
         console.log("search error:", error);
         res.status(500).send("Server Error");
@@ -97,14 +127,22 @@ const author = async (req, res) => {
             return res.status(404).send("Author not found");
         }
 
-        const news = await newsModel.find({ author: req.params.id })
-            .populate('category', { name: 1, slug: 1 })
-            .populate('author', 'fullname')
-            .sort({ createdAt: -1 });
+        // const news = await newsModel.find({ author: req.params.id })
+        //     .populate('category', { name: 1, slug: 1 })
+        //     .populate('author', 'fullname')
+        //     .sort({ createdAt: -1 });
+        const paginatedNews = await paginate(newsModel, {author: req.params.id}, 
+                               req.query, {
+                               populate: [
+                               { path: 'category', select: 'name slug' },
+                               { path: 'author', select: 'fullname' },
+                               ],
+                               sort: { createdAt: -1 },
+        });
 
         
 
-        res.render("author", { news, author });
+        res.render("author", { paginatedNews, author, query: req.query });
     } catch (error) {
         console.log("author error:", error);
         res.status(500).send("Server Error");
