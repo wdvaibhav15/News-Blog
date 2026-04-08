@@ -98,7 +98,7 @@ const ArticleValidation = [
         .trim()
         .notEmpty()
         .withMessage("Content is required")
-        .isLength({ min: 50, max: 500 })
+        .isLength({ min: 50 })
         .withMessage("Content must be between 50 and 500 characters long"),
 
     body("category")

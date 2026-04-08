@@ -48,6 +48,8 @@ router.delete("/delete-article/:id", isLoggedIn, articleController.deleteArticle
 
 // comment Routes
 router.get("/comments", isLoggedIn, commentController.allComments);
+router.put("/update-comment-status/:id", isLoggedIn, commentController.updateCommentStatus);
+router.delete("/delete-comment/:id", isLoggedIn, commentController.deleteComment);
 
 //404 Middleware
 router.use(isLoggedIn,(req, res, next) => {
@@ -67,13 +69,7 @@ router.use(isLoggedIn,(err, req, res, next) => {
         role: req.role
     });
 });
-// //500 Middleware
-// router.use(isLoggedIn,(err, req, res, next) => {
-//     res.status(500).render("admin/500", {
-//         message: err.message || "500 Internal Server Error",
-//         role: req.role
-//     });
-// });
+
 
 
 module.exports = router;

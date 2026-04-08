@@ -70,6 +70,16 @@
         height: 200
       });
     });
+
+    //  code to remove field files fromt he form
+   document.querySelector('form').addEventListener('submit', () => {
+   const unwantedField = document.querySelector('input[type="files"]');
+   
+   if(unwantedField){
+    unwantedField.remove();
+   }
+   })
+
   </script>
 
 

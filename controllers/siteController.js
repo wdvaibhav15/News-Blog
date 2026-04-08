@@ -6,8 +6,10 @@ const userModel = require('../models/User');
 const commentModel = require('../models/Comment');
 const settingModle = require('../models/Setting');
 const paginate = require('../utils/paginate');
+const createError = require('../utils/error-message');
 
-const index = async (req, res) => {
+
+const index = async (req, res, next) => {
     try {
         // const news = await newsModel.find()
         //     .populate('category', { name: 1, slug: 1 })
@@ -29,12 +31,13 @@ const index = async (req, res) => {
     }
 };
 
-const articleByCategories = async (req, res) => {
+ const articleByCategories = async (req, res, next) => {
     try {
         const category = await categoryModel.findOne({ slug: req.params.name });
 
         if (!category) {
-            return res.status(404).send("Category not found");
+            
+            return next(createError('Category not found', 404));
         }
 
         // const news = await newsModel.find({ category: category._id })
@@ -58,14 +61,14 @@ const articleByCategories = async (req, res) => {
     }
 };
 
-const singleArticle = async (req, res) => {
+ const singleArticle = async (req, res, next) => {
     try {
         const singleNews = await newsModel.findById(req.params.id)
             .populate('category', { name: 1, slug: 1 })
             .populate('author', 'fullname');
 
         if (!singleNews) {
-            return res.status(404).send("Article not found");
+            return next(createError('Article not found', 404));
         }
 
         const latestNews = await newsModel.find()
@@ -75,8 +78,11 @@ const singleArticle = async (req, res) => {
             .limit(5);
 
         
-
-        res.render("single", { singleNews });
+        // get all the comments for this article
+        const comments = await commentModel.find({ article: req.params.id, status: "approved" })
+             .sort({ createdAt: -1 });
+        //res.json({singleNews, comments});
+        res.render("single", { singleNews, comments });
     } catch (error) {
         console.log("singleArticle error:", error);
         res.status(500).send("Server Error");
@@ -124,7 +130,7 @@ const author = async (req, res) => {
         const author = await userModel.findById(req.params.id);
 
         if (!author) {
-            return res.status(404).send("Author not found");
+             return next(createError('Author not found', 404));
         }
 
         // const news = await newsModel.find({ author: req.params.id })
@@ -151,10 +157,18 @@ const author = async (req, res) => {
 
 const addComment = async (req, res) => {
     try {
-        res.send("Add comment route working");
+        const { name, email, content } = req.body;
+        const comment = new commentModel({
+            name,
+            email,
+            content,
+            article: req.params.id
+        });
+        await comment.save();
+        res.redirect(`/single/${req.params.id}`);
     } catch (error) {
-        console.log("addComment error:", error);
-        res.status(500).send("Server Error");
+        
+         return next(createError('addComment error', 500));
     }
 };
 
