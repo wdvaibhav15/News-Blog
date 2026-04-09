@@ -39,7 +39,7 @@
 </div>
 <!-- /HEADER -->
 <!-- Menu Bar -->
-<div id="menu-bar">
+<!-- <div id="menu-bar">
   <div class="container">
     <div class="row">
       <div class="col-md-12">
@@ -48,7 +48,27 @@
           <%  categories.forEach((category) => { %>
             <li><a href="/category/<%= category.slug %>"><%= category.name %></a></li>
           <% }); %>
+          <li class="ms-auto"><a href="/admin">Login/Sign Up</a></li>
           </ul>
+      </div>
+    </div>
+  </div>
+</div> -->
+ <div id="menu-bar">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <ul class="menu d-flex w-100 align-items-center">
+          <li><a href="/">Home</a></li>
+
+          <% categories.forEach((category) => { %>
+            <li><a href="/category/<%= category.slug %>"><%= category.name %></a></li>
+          <% }); %>
+
+          <li class="ms-auto">
+            <a href="/admin">Login/Sign Up</a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>

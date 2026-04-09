@@ -1,87 +1,103 @@
 <div id="admin-content">
-      <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-            <h1 class="admin-heading">Update Article</h1>
-        </div>
-        <div class="col-md-8 mx-auto">
-          <div class="card">
-            <h5 class="card-header">Update Article</h5>
-            <div class="card-body">
-              <!-- Form -->
-              <form action="/admin/update-article/<%= article._id%>" method="POST" enctype="multipart/form-data">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1 class="admin-heading">Update Article</h1>
+      </div>
+
+      <div class="col-md-8 mx-auto">
+        <div class="card">
+          <h5 class="card-header">Update Article</h5>
+          <div class="card-body">
+
+            <form action="/admin/update-article/<%= article._id %>" method="POST" enctype="multipart/form-data">
+              
+              <div class="mb-3">
+                <label for="article_title" class="form-label">Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  id="article_title"
+                  class="form-control"
+                  value="<%= article.title %>"
+                  autocomplete="off"
+                  required
+                >
+              </div>
+
+              <div class="mb-3">
+                <label for="summernote" class="form-label">Description</label>
+                <textarea
+                  name="content"
+                  id="summernote"
+                  class="form-control"
+                  rows="5"
+                  required
+                ><%= article.content %></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label for="article_image" class="form-label">Update image</label>
+                <input
+                  type="file"
+                  name="image"
+                  id="article_image"
+                  class="form-control"
+                  accept="image/*"
+                >
+              </div>
+
+              <% if (article.image) { %>
                 <div class="mb-3">
-                    <label for="article_title" class="form-label">Title</label>
-                    <input type="text" name="title" value="<%= article.title %>" id="article_title" class="form-control" autocomplete="off" required>
+                  <img 
+                    src="/images/<%= article.image %>" 
+                    alt="Article Image" 
+                    class="img-fluid rounded"
+                    style="max-height: 200px;"
+                  >
                 </div>
-                <div class="mb-3">
-                    <label for="summernote" class="form-label">Description</label>
-                    <textarea name="content" id="summernote" class="form-control" rows="5"  required><%= article.content %></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="article_category" class="form-label">Category</label>
-                    <select name="category" id="article_category" class="form-control">
-                        <% categories.forEach(category => { %>
-                          <% if(category._id.toString() === article.category._id.toString()) { %>
-                            <option value="<%= category.id %>" selected>
-                                <%= category.name %>
-                            </option>
-                          <% } else { %>
-                            <option value="<%= category.id %>" >
-                                <%= category.name %>
-                            </option>
-                          <% } %>
-                        <option value="<%= category.id %>" >
-                            <%= category.name %>
-                        </option>
-                        <% }); %>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="article_image" class="form-label">Article image</label>
-                    <br>
-                    <img 
-                src="/images/<%= article.image %>" 
-                alt="Article Image"
-                class="img-thumbnail mb-3"
-                style="width: 180px; height: 120px; object-fit: cover;">
-                    <input type="file" name="image" id="article_image" class="form-control" >
-                </div>
-                <input type="submit" name="submit" class="btn btn-primary" value="Update" />
-              </form>
-              <!--/Form -->
-               <!-- error message -->
-                 <%- include('../partials/error') %>
-                   <!--/ error message -->
-            </div>
+              <% } %>
+
+              <div class="mb-3">
+                <label for="article_category" class="form-label">Category</label>
+                <select name="category" id="article_category" class="form-control" required>
+                  <option disabled>Select Category</option>
+                  <% categories.forEach(category => { %>
+                    <option 
+                      value="<%= category._id %>"
+                      <%= article.category && article.category._id.toString() === category._id.toString() ? "selected" : "" %>>
+                      <%= category.name %>
+                    </option>
+                  <% }) %>
+                </select>
+              </div>
+
+              
+
+              <input type="submit" class="btn btn-primary" value="Update">
+            </form>
+
+            <%- include('../partials/error') %>
+
           </div>
         </div>
       </div>
-      </div>
     </div>
+  </div>
+</div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
-  <script>
-    $(document).ready(function () {
-      $('#summernote').summernote({
-        placeholder: 'Start typing...',
-        tabsize: 2,
-        height: 200
-      });
+<%- contentFor("summernoteCSS") %>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    $('#summernote').summernote({
+      placeholder: 'Update your article...',
+      tabsize: 2,
+      height: 200
     });
-
-    //  code to remove field files fromt he form
-   document.querySelector('form').addEventListener('submit', () => {
-   const unwantedField = document.querySelector('input[type="files"]');
-   
-   if(unwantedField){
-    unwantedField.remove();
-   }
-   })
-
-  </script>
-
-
-  <%- contentFor("summernoteCSS")%>
-  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
+  });
+</script>

@@ -16,8 +16,10 @@ app.use(cookieParser());
 app.use(expressLayouts);
 app.set("layout", "layout");
 
+
 // view engine setup
 app.set('view engine', 'ejs');
+
 
 // database connection
 mongoose.connect(process.env.MONGODB_URI);

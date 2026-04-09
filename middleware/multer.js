@@ -1,24 +1,21 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-
-const uploadPath = path.join(__dirname, '../public/images');
-
-// create folder if not exists
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
+const multer = require("multer");
+const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadPath);
+    cb(null, "public/images");
   },
   filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext);
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 20 * 1024 * 1024,   // 5 MB image/file limit
+    fieldSize: 10 * 1024 * 1024  // 10 MB text field limit
+  }
+});
 
 module.exports = upload;
